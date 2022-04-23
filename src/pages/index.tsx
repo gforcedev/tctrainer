@@ -1,6 +1,6 @@
-import type { NextPage } from 'next'
-import { Chessboard } from 'react-chessboard'
-import { Chess } from 'chess.ts'
+import type { NextPage } from 'next';
+import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.ts';
 import { useState } from 'react';
 import { PartialMove, Piece, Square } from 'chess.ts/dist/types';
 
@@ -42,7 +42,7 @@ const Home: NextPage = () => {
             <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
         </div>
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
