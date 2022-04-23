@@ -9,11 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@trpc/client": "^9.22.0",
+    "@trpc/next": "^9.22.0",
+    "@trpc/react": "^9.22.0",
+    "@trpc/server": "^9.22.0",
     "chess.ts": "^0.16.2",
     "next": "12.1.5",
     "react": "18.0.0",
     "react-chessboard": "^1.2.2",
-    "react-dom": "18.0.0"
+    "react-dom": "18.0.0",
+    "react-query": "^3.38.0",
+    "zod": "^3.14.4"
   },
   "devDependencies": {
     "@types/node": "17.0.25",

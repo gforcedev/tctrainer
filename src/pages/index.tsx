@@ -3,9 +3,10 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.ts';
 import { useState } from 'react';
 import { PartialMove, Piece, Square } from 'chess.ts/dist/types';
-
+import { trpc } from '@/utils/trpc';
 
 const Home: NextPage = () => {
+  const { data, isLoading } = trpc.useQuery(['hello', { text: 'TcTrainer' }]);
   const [game, setGame] = useState(new Chess());
 
   const doStep = (move: PartialMove) => {
@@ -32,15 +33,16 @@ const Home: NextPage = () => {
     }
   }
 
+  if (isLoading || !data) return <div>Loading...</div>
   return (
     <>
-        <div className="pt-4 text-xl text-center">
-            TcTrainer
-        </div>
+      <div className="pt-4 text-xl text-center">
+        { data.greeting }
+      </div>
 
-        <div className="flex justify-center pt-4">
-            <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
-        </div>
+      <div className="flex justify-center pt-4">
+        <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
+      </div>
     </>
   );
 };
