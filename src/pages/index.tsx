@@ -57,7 +57,10 @@ const Home: NextPage = () => {
       </div>
 
       <div className="flex justify-center pt-4">
-        <Chessboard position={game.fen()} onPieceDrop={onDrop}></Chessboard>
+        <Chessboard
+          /*
+          // @ts-ignore */
+          position={game.fen()} onPieceDrop={onDrop}></Chessboard>
       </div>
     </>
   );

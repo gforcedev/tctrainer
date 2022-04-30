@@ -55,6 +55,7 @@ export const appRouter = trpc
 
         if (resData.moves.length > 0) {
           return {
+            // @ts-ignore
             res: resData.moves[randomIndex(resData.moves)].san,
           };
         }
