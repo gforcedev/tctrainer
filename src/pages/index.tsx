@@ -7,7 +7,7 @@ import { trpc } from '@/utils/trpc';
 
 const Home: NextPage = () => {
   const [ game, setGame ] = useState(new Chess());
-  const utils = trpc.useContext();
+  const { client } = trpc.useContext();
 
   const doStep = async (move: PartialMove) => {
     // We already verified that the inputted move was valid
@@ -26,7 +26,7 @@ const Home: NextPage = () => {
       return g.clone();
     });
 
-    const nextMove = await utils.fetchQuery(['getBookMove', { play: history }]);
+    const nextMove = await client.query('getBookMove', { play: history });
 
     if (nextMove.res !== '') {
       setGame ((g: Chess) => {
