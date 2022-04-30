@@ -2,22 +2,40 @@ import type { NextPage } from 'next';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.ts';
 import { useState } from 'react';
-import { PartialMove, Piece, Square } from 'chess.ts/dist/types';
+import { Move, PartialMove, Piece, Square } from 'chess.ts/dist/types';
 import { trpc } from '@/utils/trpc';
 
 const Home: NextPage = () => {
-  const { data, isLoading } = trpc.useQuery(['hello', { text: 'TcTrainer' }]);
-  const [game, setGame] = useState(new Chess());
+  const [ game, setGame ] = useState(new Chess());
+  const trpcClient = trpc.createClient({ url: 'http://localhost:3000/api/trpc' });
 
-  const doStep = (move: PartialMove) => {
-    // We already verified that the move was valid
+  const doStep = async (move: PartialMove) => {
+    // We already verified that the inputted move was valid
+    // Compute the history here, apply the inputted move as
+    // fast as possible, then await the api and apply the response
+
+    let history = game
+      .history({ verbose: true })
+      .map((m: Move) => `${m.from}${m.to}`)
+      .join(',');
+    if (history !== '') history += ',';
+    history += `${move.from}${move.to}`;
+
     setGame((g: Chess) => {
-      const newGame = new Chess(g.fen());
-      newGame.move(move);
-      const moves = newGame.moves();
-      newGame.move(moves[Math.floor(Math.random() * moves.length)]);
-      return newGame;
+      g.move(move);
+      return g.clone();
     });
+
+    const nextMove = await trpcClient.query('getBookMove', { play: history });
+
+    if (nextMove.res !== '') {
+      setGame ((g: Chess) => {
+        g.move(nextMove.res);
+        return g.clone();
+      });
+    } else {
+      alert('Out of theory!');
+    }
   }
 
   const onDrop = (sourceSquare: Square, targetSquare: Square, _: Piece) => {
@@ -26,18 +44,16 @@ const Home: NextPage = () => {
       to: targetSquare,
     } as PartialMove;
     // Seems like we need to validate the move by using a new object...
-    const testGame = new Chess(game.fen());
-    if (testGame.move(pmove)) {
+    if (game.validateMoves([pmove as Move])) {
       doStep(pmove);
       return true;
     }
   }
 
-  if (isLoading || !data) return <div>Loading...</div>
   return (
     <>
       <div className="pt-4 text-xl text-center">
-        { data.greeting }
+        TcTrainer
       </div>
 
       <div className="flex justify-center pt-4">
