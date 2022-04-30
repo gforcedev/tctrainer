@@ -5,13 +5,9 @@ import { useState } from 'react';
 import { Move, PartialMove, Piece, Square } from 'chess.ts/dist/types';
 import { trpc } from '@/utils/trpc';
 
-const TRPC_URL = process.env.NEXT_PUBLIC_URL
-  ? `https://${process.env.NEXT_PUBLIC_URL}/api/trpc`
-  : `http://localhost:3000/api/trpc`;
-
 const Home: NextPage = () => {
   const [ game, setGame ] = useState(new Chess());
-  const trpcClient = trpc.createClient({ url: TRPC_URL });
+  const utils = trpc.useContext();
 
   const doStep = async (move: PartialMove) => {
     // We already verified that the inputted move was valid
@@ -30,7 +26,7 @@ const Home: NextPage = () => {
       return g.clone();
     });
 
-    const nextMove = await trpcClient.query('getBookMove', { play: history });
+    const nextMove = await utils.fetchQuery(['getBookMove', { play: history }]);
 
     if (nextMove.res !== '') {
       setGame ((g: Chess) => {
