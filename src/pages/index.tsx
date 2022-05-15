@@ -4,9 +4,10 @@ import { Chess } from 'chess.ts';
 import { useState } from 'react';
 import { Move, PartialMove, Piece, Square } from 'chess.ts/dist/types';
 import { trpc } from '@/utils/trpc';
+import MoveList from '@/components/moveList';
 
 const Home: NextPage = () => {
-  const [ game, setGame ] = useState(new Chess());
+  const [game, setGame] = useState(new Chess());
   const { client } = trpc.useContext();
 
   const doStep = async (move: PartialMove) => {
@@ -29,14 +30,14 @@ const Home: NextPage = () => {
     const nextMove = await client.query('getBookMove', { play: history });
 
     if (nextMove.res !== '') {
-      setGame ((g: Chess) => {
+      setGame((g: Chess) => {
         g.move(nextMove.res);
         return g.clone();
       });
     } else {
       alert('Out of theory!');
     }
-  }
+  };
 
   const onDrop = (sourceSquare: Square, targetSquare: Square, _: Piece) => {
     const pmove = {
@@ -48,19 +49,22 @@ const Home: NextPage = () => {
       doStep(pmove);
       return true;
     }
-  }
+  };
 
   return (
     <>
-      <div className="pt-4 text-xl text-center">
-        TcTrainer
-      </div>
+      <div className="pt-4 text-xl text-center">TcTrainer</div>
 
       <div className="flex justify-center pt-4">
         <Chessboard
-          /*
-          // @ts-ignore */
-          position={game.fen()} onPieceDrop={onDrop}></Chessboard>
+          position={game.fen()}
+          // @ts-ignore
+          onPieceDrop={onDrop}
+        ></Chessboard>
+
+        <div className="flex flex-col justify-start">
+          <MoveList moves={game.history({ verbose: true })}></MoveList>
+        </div>
       </div>
     </>
   );
